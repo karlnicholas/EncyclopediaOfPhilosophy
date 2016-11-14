@@ -7,7 +7,7 @@
 
     or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
-package philosophyencyclopedia;
+package encyclopediaofphilosophy;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,8 +36,8 @@ import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.amazon.speech.ui.SsmlOutputSpeech;
 import com.amazon.speech.ui.Reprompt;
 
-public class PhilosophyEncyclophiaSpeechlet implements Speechlet {
-    private static final Logger log = LoggerFactory.getLogger(PhilosophyEncyclophiaSpeechlet.class);
+public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
+    private static final Logger log = LoggerFactory.getLogger(EncyclophiaOfPhilosophySpeechlet.class);
 
     /**
      * URL prefix to download history content from Wikipedia.
@@ -75,8 +75,8 @@ public class PhilosophyEncyclophiaSpeechlet implements Speechlet {
         } else if ("AMAZON.HelpIntent".equals(intentName)) {
             // Create the plain text output.
             String speechOutput =
-                    "With Philosophy Encyclopedia you can get random philosophy quotes.";
-            String repromptText = "Would you like a random philosphy entry?";
+                    "With the Encyclopedia of Philosophy you can get random philosophy quotes.";
+            String repromptText = "Would you like a random quote?";
 
             return newAskResponse(speechOutput, false, repromptText, false);
         } else if ("AMAZON.StopIntent".equals(intentName)) {
@@ -109,12 +109,12 @@ public class PhilosophyEncyclophiaSpeechlet implements Speechlet {
      * @return SpeechletResponse object with voice/card response to return to the user
      */
     private SpeechletResponse getWelcomeResponse() {
-        String speechOutput = "Plato. Would you like an entry?";
+        String speechOutput = "Encyclopedia of Philosophy. Would you like an entry?";
         // If the user either does not reply to the welcome message or says something that is not
         // understood, they will be prompted again with this text.
         String repromptText =
-                "With Philosophy Encyclopedia you can get random philosophy quotes." 
-                        + " Would you like one?";
+                "With the Encyclopedia of Philosophy you can get random philosophy quotes." 
+                        + " Would you like a quote?";
 
         return newAskResponse(speechOutput, false, repromptText, false);
     }
@@ -135,7 +135,7 @@ public class PhilosophyEncyclophiaSpeechlet implements Speechlet {
 
         String entry = getEntryFromStanford();
         String speechOutput =
-                "There is a problem connecting to the Philosophy Encyclopedia at this time."
+                "There is a problem connecting to the Encyclopedia of Philosophy at this time."
                         + " Please try again later.";
         if (!entry.isEmpty()) {
         	speechOutput = entry;

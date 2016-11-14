@@ -7,7 +7,7 @@
 
     or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
-package philosophyencyclopedia;
+package encyclopediaofphilosophy;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,7 +22,7 @@ import com.amazon.speech.speechlet.lambda.SpeechletRequestStreamHandler;
  * build this project using the {@code lambda-compile} Ant task and upload the resulting zip file to
  * power your function.
  */
-public class PhilosophyEncyclophiaSpeechletRequestStreamHandler extends SpeechletRequestStreamHandler {
+public class EncyclophiaOfPhilosophySpeechletRequestStreamHandler extends SpeechletRequestStreamHandler {
 
     private static final Set<String> supportedApplicationIds;
 
@@ -35,11 +35,11 @@ public class PhilosophyEncyclophiaSpeechletRequestStreamHandler extends Speechle
         supportedApplicationIds.add("amzn1.ask.skill.b73dddb0-1092-421d-bfdd-04f9e61eff9a");
     }
 
-    public PhilosophyEncyclophiaSpeechletRequestStreamHandler() {
-        super(new PhilosophyEncyclophiaSpeechlet(), supportedApplicationIds);
+    public EncyclophiaOfPhilosophySpeechletRequestStreamHandler() {
+        super(new EncyclophiaOfPhilosophySpeechlet(), supportedApplicationIds);
     }
 
-    public PhilosophyEncyclophiaSpeechletRequestStreamHandler(Speechlet speechlet,
+    public EncyclophiaOfPhilosophySpeechletRequestStreamHandler(Speechlet speechlet,
             Set<String> supportedApplicationIds) {
         super(speechlet, supportedApplicationIds);
     }

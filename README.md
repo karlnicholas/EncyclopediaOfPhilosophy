@@ -14,11 +14,11 @@ To run this example skill you need to do two things. The first is to deploy the 
 1. Go to the AWS Console and click on the Lambda link. Note: ensure you are in us-east or you wont be able to use Alexa with Lambda.
 2. Click on the Create a Lambda Function or Get Started Now button.
 3. Skip the blueprint
-4. Name the Lambda Function "Philosophy-Encyclopedia-Skill".
+4. Name the Lambda Function "Encyclopedia-Of-Philosophy-Skill".
 5. Select the runtime as Java 8
 6. Go to the the samples/ directory containing pom.xml, and run 'mvn assembly:assembly -DdescriptorId=jar-with-dependencies package'. This will generate a zip file named "alexa-skills-kit-samples-1.0-jar-with-dependencies.jar" in the target directory.
 7. Select Code entry type as "Upload a .ZIP file" and then upload the "alexa-skills-kit-samples-1.0-jar-with-dependencies.jar" file from the build directory to Lambda
-8. Set the Handler as philosophyencyclopedia.PhilosophyEncyclophiaSpeechletRequestStreamHandler (this refers to the Lambda RequestStreamHandler file in the zip).
+8. Set the Handler as encyclopediaofphilosophy.EncyclophiaOfPhilosophySpeechletRequestStreamHandler (this refers to the Lambda RequestStreamHandler file in the zip).
 9. Create a basic execution role and click create.
 10. Leave the Advanced settings as the defaults.
 11. Click "Next" and review the settings then click "Create Function"
@@ -40,5 +40,5 @@ To run this example skill you need to do two things. The first is to deploy the 
 
 ## Examples
 ### One-shot model:
-  User: "Alexa, ask Philosophy Encyclopedia for a quote."
+  User: "Alexa, ask Encyclopedia of Philosophy  for a quote."
   Alexa: "Pragmatism was a philosophical tradition that originated in the United States around 1870 ..."
