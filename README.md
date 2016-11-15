@@ -28,7 +28,7 @@ To run this example skill you need to do two things. The first is to deploy the 
 
 ### Alexa Skill Setup
 1. Go to the [Alexa Console](https://developer.amazon.com/edw/home.html) and click Add a New Skill.
-2. Set "Philosophy Encyclopedia" as the skill name and "Philosophy Encyclopedia" as the invocation name, this is what is used to activate your skill. For example you would say: "Alexa, Ask Philosophy Encyclopedia for a quote.."
+2. Set "Encyclopedia of Philosophy" as the skill name and "Encyclopedia of Philosophy" as the invocation name, this is what is used to activate your skill. For example you would say: "Alexa, Ask Encyclopedia of Philosophy for a quote.."
 3. Select the Lambda ARN for the skill Endpoint and paste the ARN copied from above. Click Next.
 4. Copy the Intent Schema from the included IntentSchema.json.
 5. Copy the Sample Utterances from the included SampleUtterances.txt. Click Next.
