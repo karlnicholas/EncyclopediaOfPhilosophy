@@ -40,7 +40,7 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
     private static final Logger log = LoggerFactory.getLogger(EncyclophiaOfPhilosophySpeechlet.class);
 
     /**
-     * URL prefix to download history content from Wikipedia.
+     * URL prefix to download random quote from Encyclopedia of Philosophy.
      */
     private static final String URL_PREFIX = "http://plato.stanford.edu/cgi-bin/encyclopedia/random";
 
@@ -157,7 +157,7 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
             inputStream = new InputStreamReader(url.openStream(), Charset.forName("US-ASCII"));
             bufferedReader = new BufferedReader(inputStream);
             StringBuilder builder = new StringBuilder();
-            char[] cbuf = new char[8096];
+            char[] cbuf = new char[8196];
             int count;
             while ( (count = bufferedReader.read(cbuf, 0, cbuf.length)) > 0 ) {
                 builder.append(cbuf, 0, count);
