@@ -148,38 +148,22 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
             return SpeechletResponse.newTellResponse(outputSpeech);
     }
 
-	private String getEntryFromStanford() {
-        InputStreamReader inputStream = null;
-        BufferedReader bufferedReader = null;
+	public String getEntryFromStanford() {
         String text = "";
-        try {
-            URL url = new URL(URL_PREFIX);
-            inputStream = new InputStreamReader(url.openStream(), Charset.forName("US-ASCII"));
-            bufferedReader = new BufferedReader(inputStream);
-            StringBuilder builder = new StringBuilder();
-            char[] cbuf = new char[8196];
-            int count;
-            while ( (count = bufferedReader.read(cbuf, 0, cbuf.length)) > 0 ) {
-                builder.append(cbuf, 0, count);
-            }
-            text = builder.toString();
-        } catch (IOException e) {
-            // reset text variable to a blank string
-            text = "";
-        } finally {
-            IOUtils.closeQuietly(inputStream);
-            IOUtils.closeQuietly(bufferedReader);
-        }
-
-		Document doc = Jsoup.parse(text);	
-		Elements preamble = doc.select("div[id=preamble] p");
-		if ( preamble != null ) {
-			if (preamble.first() != null ) 
-				text = preamble.first().text();
-		}
+		Document doc;
+		try {
+			doc = Jsoup.connect(URL_PREFIX).get();
+			Elements preamble = doc.select("div[id=preamble] p");
+			if ( preamble != null ) {
+				if (preamble.first() != null ) 
+					text = preamble.first().text();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
 		return text;
 	}
-
 
 	/**
      * Wrapper for creating the Ask response from the input strings.
