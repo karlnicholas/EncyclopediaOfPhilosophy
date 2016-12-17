@@ -32,168 +32,164 @@ import com.amazon.speech.ui.SsmlOutputSpeech;
 import com.amazon.speech.ui.Reprompt;
 
 public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
-    private static final Logger log = LoggerFactory.getLogger(EncyclophiaOfPhilosophySpeechlet.class);
+	private static final Logger log = LoggerFactory.getLogger(EncyclophiaOfPhilosophySpeechlet.class);
 
-    /**
-     * URL prefix to download random quote from Encyclopedia of Philosophy.
-     */
-    private static final String URL_PREFIX = "http://plato.stanford.edu/cgi-bin/encyclopedia/random";
+	/**
+	 * URL prefix to download random quote from Encyclopedia of Philosophy.
+	 */
+	protected static final String URL_PREFIX = "http://plato.stanford.edu/cgi-bin/encyclopedia/random";
+//    private PingSEP pingSEP = new PingSEP();  
 
-    @Override
-    public void onSessionStarted(final SessionStartedRequest request, final Session session) throws SpeechletException {
-        log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(),
-                session.getSessionId());
+	@Override
+	public void onSessionStarted(final SessionStartedRequest request, final Session session) throws SpeechletException {
+		log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
 
-        // any initialization logic goes here
-    }
+		// any initialization logic goes here
+	}
 
-    @Override
-    public SpeechletResponse onLaunch(final LaunchRequest request, final Session session)
-            throws SpeechletException {
-        log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(),
-                session.getSessionId());
+	@Override
+	public SpeechletResponse onLaunch(final LaunchRequest request, final Session session) throws SpeechletException {
+		log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
 
-        return getWelcomeResponse();
-    }
+		return getWelcomeResponse();
+	}
 
-    @Override
-    public SpeechletResponse onIntent(final IntentRequest request, final Session session)
-            throws SpeechletException {
-        log.info("onIntent requestId={}, sessionId={}", request.getRequestId(),
-                session.getSessionId());
+	@Override
+	public SpeechletResponse onIntent(final IntentRequest request, final Session session) throws SpeechletException {
+		log.info("onIntent requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
 
-        Intent intent = request.getIntent();
-        String intentName = intent.getName();
+		Intent intent = request.getIntent();
+		String intentName = intent.getName();
 
-        if ("GetQuote".equals(intentName)) {
-            return handleFirstEventRequest(intent, session);
-        } else if ("AMAZON.HelpIntent".equals(intentName)) {
-            // Create the plain text output.
-            String speechOutput =
-                    "With the Encyclopedia of Philosophy you can get random philosophy quotes.";
-            String repromptText = "Would you like a random quote?";
+		if ("GetQuote".equals(intentName)) {
+//			new Thread(pingSEP).start();
+			return handleFirstEventRequest(intent, session);
+		} else if ("AMAZON.HelpIntent".equals(intentName)) {
+			// Create the plain text output.
+			String speechOutput = "With the Encyclopedia of Philosophy you can get random philosophy quotes.";
+			String repromptText = "Would you like a random quote?";
 
-            return newAskResponse(speechOutput, false, repromptText, false);
-        } else if ("AMAZON.StopIntent".equals(intentName)) {
-            PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
-            outputSpeech.setText("Goodbye");
+			return newAskResponse(speechOutput, false, repromptText, false);
+		} else if ("AMAZON.StopIntent".equals(intentName)) {
+			PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+			outputSpeech.setText("Goodbye");
 
-            return SpeechletResponse.newTellResponse(outputSpeech);
-        } else if ("AMAZON.CancelIntent".equals(intentName)) {
-            PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
-            outputSpeech.setText("Goodbye");
+			return SpeechletResponse.newTellResponse(outputSpeech);
+		} else if ("AMAZON.CancelIntent".equals(intentName)) {
+			PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+			outputSpeech.setText("Goodbye");
 
-            return SpeechletResponse.newTellResponse(outputSpeech);
-        } else {
-            throw new SpeechletException("Invalid Intent");
-        }
-    }
+			return SpeechletResponse.newTellResponse(outputSpeech);
+		} else {
+			throw new SpeechletException("Invalid Intent");
+		}
+	}
 
-    @Override
-    public void onSessionEnded(final SessionEndedRequest request, final Session session)
-            throws SpeechletException {
-        log.info("onSessionEnded requestId={}, sessionId={}", request.getRequestId(),
-                session.getSessionId());
+	@Override
+	public void onSessionEnded(final SessionEndedRequest request, final Session session) throws SpeechletException {
+		log.info("onSessionEnded requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
 
-        // any session cleanup logic would go here
-    }
+		// any session cleanup logic would go here
+	}
 
-    /**
-     * Function to handle the onLaunch skill behavior.
-     * 
-     * @return SpeechletResponse object with voice/card response to return to the user
-     */
-    private SpeechletResponse getWelcomeResponse() {
-        String speechOutput = "Encyclopedia of Philosophy. Would you like an entry?";
-        // If the user either does not reply to the welcome message or says something that is not
-        // understood, they will be prompted again with this text.
-        String repromptText =
-                "With the Encyclopedia of Philosophy you can get random philosophy quotes." 
-                        + " Would you like a quote?";
+	/**
+	 * Function to handle the onLaunch skill behavior.
+	 * 
+	 * @return SpeechletResponse object with voice/card response to return to
+	 *         the user
+	 */
+	private SpeechletResponse getWelcomeResponse() {
+		String speechOutput = "Encyclopedia of Philosophy. Would you like an entry?";
+		// If the user either does not reply to the welcome message or says
+		// something that is not
+		// understood, they will be prompted again with this text.
+		String repromptText = "With the Encyclopedia of Philosophy you can get random philosophy quotes."
+				+ " Would you like a quote?";
 
-        return newAskResponse(speechOutput, false, repromptText, false);
-    }
+		return newAskResponse(speechOutput, false, repromptText, false);
+	}
 
+	/**
+	 * Prepares the speech to reply to the user. Obtain events from Wikipedia
+	 * for the date specified by the user (or for today's date, if no date is
+	 * specified), and return those events in both speech and SimpleCard format.
+	 * 
+	 * @param intent
+	 *            the intent object which contains the date slot
+	 * @param session
+	 *            the session object
+	 * @return SpeechletResponse object with voice/card response to return to
+	 *         the user
+	 */
+	private SpeechletResponse handleFirstEventRequest(Intent intent, Session session) {
 
-    /**
-     * Prepares the speech to reply to the user. Obtain events from Wikipedia for the date specified
-     * by the user (or for today's date, if no date is specified), and return those events in both
-     * speech and SimpleCard format.
-     * 
-     * @param intent
-     *            the intent object which contains the date slot
-     * @param session
-     *            the session object
-     * @return SpeechletResponse object with voice/card response to return to the user
-     */
-    private SpeechletResponse handleFirstEventRequest(Intent intent, Session session) {
+		String entry = getEntryFromStanford();
+		String speechOutput = "There is a problem connecting to the Encyclopedia of Philosophy at this time."
+				+ " Please try again later.";
 
-        String entry = getEntryFromStanford();
-        String speechOutput =
-                "There is a problem connecting to the Encyclopedia of Philosophy at this time."
-                        + " Please try again later.";
-        if (!entry.isEmpty()) {
-        	speechOutput = entry;
-        }
+		if (!entry.isEmpty()) {
+			speechOutput = entry;
+		}
 
-            // Create the plain text output
-            SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
-            outputSpeech.setSsml("<speak>" + speechOutput + "</speak>");
+		// Create the plain text output
+		SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
+		outputSpeech.setSsml("<speak>" + speechOutput + "</speak>");
 
-            return SpeechletResponse.newTellResponse(outputSpeech);
-    }
+		return SpeechletResponse.newTellResponse(outputSpeech);
+	}
 
 	public String getEntryFromStanford() {
-        String text = "";
+		String text = "";
 		Document doc;
 		try {
 			doc = Jsoup.connect(URL_PREFIX).get();
 			Elements preamble = doc.select("div[id=preamble] p");
-			if ( preamble != null ) {
-				if (preamble.first() != null ) 
+			if (preamble != null) {
+				if (preamble.first() != null)
 					text = preamble.first().text();
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
+		}
 		return text;
 	}
 
 	/**
-     * Wrapper for creating the Ask response from the input strings.
-     * 
-     * @param stringOutput
-     *            the output to be spoken
-     * @param isOutputSsml
-     *            whether the output text is of type SSML
-     * @param repromptText
-     *            the reprompt for if the user doesn't reply or is misunderstood.
-     * @param isRepromptSsml
-     *            whether the reprompt text is of type SSML
-     * @return SpeechletResponse the speechlet response
-     */
-    private SpeechletResponse newAskResponse(String stringOutput, boolean isOutputSsml,
-            String repromptText, boolean isRepromptSsml) {
-        OutputSpeech outputSpeech, repromptOutputSpeech;
-        if (isOutputSsml) {
-            outputSpeech = new SsmlOutputSpeech();
-            ((SsmlOutputSpeech) outputSpeech).setSsml(stringOutput);
-        } else {
-            outputSpeech = new PlainTextOutputSpeech();
-            ((PlainTextOutputSpeech) outputSpeech).setText(stringOutput);
-        }
+	 * Wrapper for creating the Ask response from the input strings.
+	 * 
+	 * @param stringOutput
+	 *            the output to be spoken
+	 * @param isOutputSsml
+	 *            whether the output text is of type SSML
+	 * @param repromptText
+	 *            the reprompt for if the user doesn't reply or is
+	 *            misunderstood.
+	 * @param isRepromptSsml
+	 *            whether the reprompt text is of type SSML
+	 * @return SpeechletResponse the speechlet response
+	 */
+	private SpeechletResponse newAskResponse(String stringOutput, boolean isOutputSsml, String repromptText,
+			boolean isRepromptSsml) {
+		OutputSpeech outputSpeech, repromptOutputSpeech;
+		if (isOutputSsml) {
+			outputSpeech = new SsmlOutputSpeech();
+			((SsmlOutputSpeech) outputSpeech).setSsml(stringOutput);
+		} else {
+			outputSpeech = new PlainTextOutputSpeech();
+			((PlainTextOutputSpeech) outputSpeech).setText(stringOutput);
+		}
 
-        if (isRepromptSsml) {
-            repromptOutputSpeech = new SsmlOutputSpeech();
-            ((SsmlOutputSpeech) repromptOutputSpeech).setSsml(repromptText);
-        } else {
-            repromptOutputSpeech = new PlainTextOutputSpeech();
-            ((PlainTextOutputSpeech) repromptOutputSpeech).setText(repromptText);
-        }
-        Reprompt reprompt = new Reprompt();
-        reprompt.setOutputSpeech(repromptOutputSpeech);
-        return SpeechletResponse.newAskResponse(outputSpeech, reprompt);
-    }
+		if (isRepromptSsml) {
+			repromptOutputSpeech = new SsmlOutputSpeech();
+			((SsmlOutputSpeech) repromptOutputSpeech).setSsml(repromptText);
+		} else {
+			repromptOutputSpeech = new PlainTextOutputSpeech();
+			((PlainTextOutputSpeech) repromptOutputSpeech).setText(repromptText);
+		}
+		Reprompt reprompt = new Reprompt();
+		reprompt.setOutputSpeech(repromptOutputSpeech);
+		return SpeechletResponse.newAskResponse(outputSpeech, reprompt);
+	}
 
 }
