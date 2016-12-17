@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import encyclopediaofphilosophy.EncyclophiaOfPhilosophySpeechlet;
 
-public class PingSEP extends Runnable {
+public class PingSEP implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(PingSEP.class);
 	
 	public void run() {
