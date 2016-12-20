@@ -69,6 +69,7 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 		String intentName = intent.getName();
 
 		if ("GetQuote".equals(intentName)) {
+			log.info("Intent = GetQuote");
 			return handleFirstEventRequest(intent, session);
 		} else if ("SearchIntent".equals(intentName)) {
 	        // add a player to the current game,
@@ -78,6 +79,7 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 	        if (searchPhrase == null || searchPhrase.isEmpty()) {
 				SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
 				outputSpeech.setSsml("<speak>Sorry, I didn't understand the search phrase.</speak>");
+				log.info("Didn't understand the search phrase: ");
 				return SpeechletResponse.newTellResponse(outputSpeech);
 	        }
 
@@ -90,10 +92,12 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 					
 					SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
 					outputSpeech.setSsml("<speak>Results for \"" + searchPhrase +"\".<break strength=\"x-strong\"/>" + searchResults.get(0).preamble + "</speak>");
+					log.info("Search found for " + searchPhrase + ". Result: " + searchResults.get(0).name + " at " + searchResults.get(0).url);
 					return SpeechletResponse.newTellResponse(outputSpeech);
 				} else {
 					SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
 					outputSpeech.setSsml("<speak>Sorry, no results found for the search phrase " + searchPhrase + ".</speak>");
+					log.info("No results for " + searchPhrase);
 					return SpeechletResponse.newTellResponse(outputSpeech);
 				}
 			} catch (ParseException | IOException e) {
