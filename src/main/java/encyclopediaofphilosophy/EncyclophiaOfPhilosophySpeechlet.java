@@ -10,7 +10,9 @@
 package encyclopediaofphilosophy;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -29,16 +31,21 @@ import com.amazon.speech.speechlet.SpeechletResponse;
 import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.amazon.speech.ui.SsmlOutputSpeech;
+
+import sep.lucene.SearchFiles;
+import sep.lucene.SearchResult;
+
 import com.amazon.speech.ui.Reprompt;
 
 public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 	private static final Logger log = LoggerFactory.getLogger(EncyclophiaOfPhilosophySpeechlet.class);
-
+	
 	/**
 	 * URL prefix to download random quote from Encyclopedia of Philosophy.
 	 */
 	protected static final String URL_PREFIX = "http://plato.stanford.edu/cgi-bin/encyclopedia/random";
-//    private PingSEP pingSEP = new PingSEP();  
+    private static final String SLOT_SEARCH_PHRASE = "SearchPhrase";
+    private SearchFiles searchFiles = new SearchFiles();
 
 	@Override
 	public void onSessionStarted(final SessionStartedRequest request, final Session session) throws SpeechletException {
@@ -51,7 +58,7 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 	public SpeechletResponse onLaunch(final LaunchRequest request, final Session session) throws SpeechletException {
 		log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
 
-		return getWelcomeResponse();
+	    return getWelcomeResponse();
 	}
 
 	@Override
@@ -62,8 +69,36 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 		String intentName = intent.getName();
 
 		if ("GetQuote".equals(intentName)) {
-//			new Thread(pingSEP).start();
 			return handleFirstEventRequest(intent, session);
+		} else if ("SearchIntent".equals(intentName)) {
+	        // add a player to the current game,
+	        // terminate or continue the conversation based on whether the intent
+	        // is from a one shot command or not.
+	        String searchPhrase = intent.getSlot(SLOT_SEARCH_PHRASE).getValue();
+	        if (searchPhrase == null || searchPhrase.isEmpty()) {
+				SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
+				outputSpeech.setSsml("<speak>Sorry, I didn't understand the search phrase.</speak>");
+				return SpeechletResponse.newTellResponse(outputSpeech);
+	        }
+
+			try {
+				List<SearchResult> searchResults = searchFiles.query(searchPhrase);
+				if ( searchResults.size() > 0 ) {
+					// Create the plain text output
+				    PingSEP pingSEP = new PingSEP(searchResults.get(0).url);  
+					new Thread(pingSEP).start();
+					
+					SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
+					outputSpeech.setSsml("<speak>Results for \"" + searchPhrase +"\".<break strength=\"x-strong\"/>" + searchResults.get(0).preamble + "</speak>");
+					return SpeechletResponse.newTellResponse(outputSpeech);
+				} else {
+					SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
+					outputSpeech.setSsml("<speak>Sorry, no results found for the search phrase " + searchPhrase + ".</speak>");
+					return SpeechletResponse.newTellResponse(outputSpeech);
+				}
+			} catch (ParseException | IOException e) {
+				throw new SpeechletException(e);
+			}
 		} else if ("AMAZON.HelpIntent".equals(intentName)) {
 			// Create the plain text output.
 			String speechOutput = "With the Encyclopedia of Philosophy you can get random philosophy quotes.";
@@ -133,7 +168,7 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 
 		// Create the plain text output
 		SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
-		outputSpeech.setSsml("<speak>" + speechOutput + "</speak>");
+		outputSpeech.setSsml("<speak>Random quote.<break strength=\"x-strong\"/>" + speechOutput + "</speak>");
 
 		return SpeechletResponse.newTellResponse(outputSpeech);
 	}

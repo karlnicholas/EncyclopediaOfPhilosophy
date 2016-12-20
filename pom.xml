@@ -76,6 +76,11 @@
     	<artifactId>httpclient</artifactId>
     	<version>4.5.2</version>
     </dependency>
+    <dependency>
+    	<groupId>SEP</groupId>
+    	<artifactId>SEP</artifactId>
+    	<version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <properties>
@@ -92,8 +97,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.3</version>
           <configuration>
-            <source>1.7</source>
-            <target>1.7</target>
+            <source>1.8</source>
+            <target>1.8</target>
           </configuration>
         </plugin>
 

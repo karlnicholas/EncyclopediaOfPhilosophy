@@ -4,6 +4,15 @@
       "intent": "GetQuote"
     },
     {
+      "intent": "SearchIntent", 
+      "slots": [
+        {
+          "name": "SearchPhrase",
+          "type": "LIST_OF_SEARCH_PHRASES"
+        }
+      ]
+    },
+    {
       "intent": "AMAZON.HelpIntent"
     },
     {

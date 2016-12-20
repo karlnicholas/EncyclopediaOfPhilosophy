@@ -7,6 +7,10 @@ GetQuote to tell me something
 GetQuote to wax philosophical
 GetQuote to give me a quote
 
+SearchIntent to look for {SearchPhrase}
+SearchIntent to find {SearchPhrase}
+SearchIntent to search for {SearchPhrase}
+SearchIntent about {SearchPhrase}
 
 AMAZON.StopIntent no
 AMAZON.StopIntent nope

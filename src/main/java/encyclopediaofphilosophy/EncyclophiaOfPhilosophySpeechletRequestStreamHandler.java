@@ -32,7 +32,7 @@ public class EncyclophiaOfPhilosophySpeechletRequestStreamHandler extends Speech
          * Alexa Skill and put the relevant Application Ids in this Set.
          */
         supportedApplicationIds = new HashSet<String>();
-        supportedApplicationIds.add("");
+        supportedApplicationIds.add("xxx");
     }
 
     public EncyclophiaOfPhilosophySpeechletRequestStreamHandler() {

@@ -1,22 +1,38 @@
 
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.lucene.queryparser.classic.ParseException;
+
 import encyclopediaofphilosophy.PingSEP;
+import sep.lucene.SearchFiles;
+import sep.lucene.SearchResult;
 
 public class Test {
 	
-    private PingSEP pingSEP = new PingSEP();
+    SearchFiles searchFiles;
     
 	public static void main(String[] args) {
 		new Test().run();
 	}
+	public Test() {
+		searchFiles = new SearchFiles();
+	}
 	public void run() {
-		new Thread(pingSEP).start();
+		List<SearchResult> searchResults;
 		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
+			searchResults = searchFiles.query("philosophy");
+			if ( searchResults.size() > 0 ) {
+				System.out.println("Found results: " + searchResults.size());
+				for ( SearchResult searchResult: searchResults ) {
+					System.out.println(searchResult);
+				}
+				System.out.println("Best result\n"+searchResults.get(0).preamble);
+			}
+		} catch (ParseException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		new Thread(pingSEP).start();
 	}
 
 }
