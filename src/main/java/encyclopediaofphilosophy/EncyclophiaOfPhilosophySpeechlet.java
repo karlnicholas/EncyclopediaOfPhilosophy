@@ -113,7 +113,7 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 					log.info("Search found for " + searchPhrase + ". Result: " + searchResults.get(0).name + " at " + searchResults.get(0).url);
 					SimpleCard card = new SimpleCard();
 					card.setTitle("Encyclopedia of Philosophy");
-					card.setContent(searchResult.name+"\nhttps://plato.stanford.edu/win2016/"+searchResult.url+"\n"+searchResult.preamble);
+					card.setContent(searchResult.name+"\nhttps://plato.stanford.edu/archives/win2016/"+searchResult.url+"\n"+searchResult.preamble);
 					SpeechletResponse speechletResponse = SpeechletResponse.newTellResponse(outputSpeech);
 					speechletResponse.setCard(card);
 					return speechletResponse;
