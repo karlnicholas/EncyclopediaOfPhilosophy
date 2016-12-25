@@ -10,9 +10,11 @@
 package encyclopediaofphilosophy;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -36,6 +38,7 @@ import sep.lucene.SearchFiles;
 import sep.lucene.SearchResult;
 
 import com.amazon.speech.ui.Reprompt;
+import com.amazon.speech.ui.SimpleCard;
 
 public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 	private static final Logger log = LoggerFactory.getLogger(EncyclophiaOfPhilosophySpeechlet.class);
@@ -57,7 +60,6 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 	@Override
 	public SpeechletResponse onLaunch(final LaunchRequest request, final Session session) throws SpeechletException {
 		log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
-
 	    return getWelcomeResponse();
 	}
 
@@ -69,8 +71,23 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 		String intentName = intent.getName();
 
 		if ("GetQuote".equals(intentName)) {
-			log.info("Intent = GetQuote");
-			return handleFirstEventRequest(intent, session);
+			SearchResult searchResult = getEntryFromStanford();
+			if ( searchResult.preamble.isEmpty()) {
+				log.info("Intent = GetQuote: *** fails *** ");
+				SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
+				outputSpeech.setSsml("<speak>There is a problem connecting to the Encyclopedia of Philosophy at this time."
+						+ " Please try again later.</speak>");
+				return SpeechletResponse.newTellResponse(outputSpeech);
+			}
+			log.info("Intent = GetQuote: " + searchResult.name);
+			SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
+			outputSpeech.setSsml("<speak>"+searchResult.subject+"<break strength=\"x-strong\"/>" + searchResult.preamble + "</speak>");
+			SimpleCard card = new SimpleCard();
+			card.setTitle("Encyclopedia of Philosophy");
+			card.setContent(searchResult.name+"\n"+searchResult.url+"\n"+searchResult.preamble);
+			SpeechletResponse speechletResponse = SpeechletResponse.newTellResponse(outputSpeech);
+			speechletResponse.setCard(card);
+			return speechletResponse;
 		} else if ("SearchIntent".equals(intentName)) {
 	        // add a player to the current game,
 	        // terminate or continue the conversation based on whether the intent
@@ -78,7 +95,7 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 	        String searchPhrase = intent.getSlot(SLOT_SEARCH_PHRASE).getValue();
 	        if (searchPhrase == null || searchPhrase.isEmpty()) {
 				SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
-				outputSpeech.setSsml("<speak>Sorry, I didn't understand the search phrase.</speak>");
+				outputSpeech.setSsml("<speak>Sorry, I didn't understand that word or phrase.</speak>");
 				log.info("Didn't understand the search phrase: ");
 				return SpeechletResponse.newTellResponse(outputSpeech);
 	        }
@@ -87,16 +104,22 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 				List<SearchResult> searchResults = searchFiles.query(searchPhrase);
 				if ( searchResults.size() > 0 ) {
 					// Create the plain text output
-				    PingSEP pingSEP = new PingSEP(searchResults.get(0).url);  
+					SearchResult searchResult = searchResults.get(0);
+				    PingSEP pingSEP = new PingSEP(searchResult.url);  
 					new Thread(pingSEP).start();
 					
 					SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
 					outputSpeech.setSsml("<speak>Results for \"" + searchPhrase +"\".<break strength=\"x-strong\"/>" + searchResults.get(0).preamble + "</speak>");
 					log.info("Search found for " + searchPhrase + ". Result: " + searchResults.get(0).name + " at " + searchResults.get(0).url);
-					return SpeechletResponse.newTellResponse(outputSpeech);
+					SimpleCard card = new SimpleCard();
+					card.setTitle("Encyclopedia of Philosophy");
+					card.setContent(searchResult.name+"\nhttps://plato.stanford.edu/win2016/"+searchResult.url+"\n"+searchResult.preamble);
+					SpeechletResponse speechletResponse = SpeechletResponse.newTellResponse(outputSpeech);
+					speechletResponse.setCard(card);
+					return speechletResponse;
 				} else {
 					SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
-					outputSpeech.setSsml("<speak>Sorry, no results found for the search phrase " + searchPhrase + ".</speak>");
+					outputSpeech.setSsml("<speak>Sorry, nothing found for " + searchPhrase + ".</speak>");
 					log.info("No results for " + searchPhrase);
 					return SpeechletResponse.newTellResponse(outputSpeech);
 				}
@@ -105,8 +128,8 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 			}
 		} else if ("AMAZON.HelpIntent".equals(intentName)) {
 			// Create the plain text output.
-			String speechOutput = "With the Encyclopedia of Philosophy you can get random philosophy quotes.";
-			String repromptText = "Would you like a random quote?";
+			String speechOutput = "With the Encyclopedia of Philosophy you can say get a quote or ask to search for a word or phrase.";
+			String repromptText = "Would you like a quote?";
 
 			return newAskResponse(speechOutput, false, repromptText, false);
 		} else if ("AMAZON.StopIntent".equals(intentName)) {
@@ -148,50 +171,35 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 		return newAskResponse(speechOutput, false, repromptText, false);
 	}
 
-	/**
-	 * Prepares the speech to reply to the user. Obtain events from Wikipedia
-	 * for the date specified by the user (or for today's date, if no date is
-	 * specified), and return those events in both speech and SimpleCard format.
-	 * 
-	 * @param intent
-	 *            the intent object which contains the date slot
-	 * @param session
-	 *            the session object
-	 * @return SpeechletResponse object with voice/card response to return to
-	 *         the user
-	 */
-	private SpeechletResponse handleFirstEventRequest(Intent intent, Session session) {
 
-		String entry = getEntryFromStanford();
-		String speechOutput = "There is a problem connecting to the Encyclopedia of Philosophy at this time."
-				+ " Please try again later.";
-
-		if (!entry.isEmpty()) {
-			speechOutput = entry;
-		}
-
-		// Create the plain text output
-		SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
-		outputSpeech.setSsml("<speak>Random quote.<break strength=\"x-strong\"/>" + speechOutput + "</speak>");
-
-		return SpeechletResponse.newTellResponse(outputSpeech);
-	}
-
-	public String getEntryFromStanford() {
+	public SearchResult getEntryFromStanford() {
 		String text = "";
+		String subject = "";
+		String url = "";
 		Document doc;
 		try {
-			doc = Jsoup.connect(URL_PREFIX).get();
+			Response response = Jsoup.connect(URL_PREFIX)
+	                .followRedirects(true) //to follow redirects
+	                .execute();
+			doc = response.parse();
 			Elements preamble = doc.select("div[id=preamble] p");
+			URL rUrl = response.url();
+			if ( rUrl != null )
+				url = rUrl.toString();
+			
+			Elements subjects = doc.select("div[id=aueditable] h1");
+			if ( subjects != null ) 
+				if ( subjects.first() != null )
+					subject = subjects.first().ownText();
+			
 			if (preamble != null) {
 				if (preamble.first() != null)
 					text = preamble.first().text();
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
-		return text;
+		return new SearchResult(subject, url, subject, text, (float)1.0);
 	}
 
 	/**
