@@ -81,7 +81,7 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 			}
 			log.info("Intent = GetQuote: " + searchResult.name);
 			SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
-			outputSpeech.setSsml("<speak>"+searchResult.subject+"<break strength=\"x-strong\"/>" + searchResult.preamble + "</speak>");
+			outputSpeech.setSsml("<speak>Random entry for "+searchResult.subject+"<break strength=\"x-strong\"/>" + searchResult.preamble + "</speak>");
 			SimpleCard card = new SimpleCard();
 			card.setTitle("Encyclopedia of Philosophy");
 			card.setContent(searchResult.name+"\n"+searchResult.url+"\n"+searchResult.preamble);
@@ -161,12 +161,8 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 	 *         the user
 	 */
 	private SpeechletResponse getWelcomeResponse() {
-		String speechOutput = "Encyclopedia of Philosophy. Would you like an entry?";
-		// If the user either does not reply to the welcome message or says
-		// something that is not
-		// understood, they will be prompted again with this text.
-		String repromptText = "With the Encyclopedia of Philosophy you can get random philosophy quotes."
-				+ " Would you like a quote?";
+		String speechOutput = "With the Encyclopedia of Philosophy you can say get a quote or ask to search for a word or phrase.";
+		String repromptText = "Would you like a quote?";
 
 		return newAskResponse(speechOutput, false, repromptText, false);
 	}
