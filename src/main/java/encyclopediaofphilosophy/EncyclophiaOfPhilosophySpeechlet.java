@@ -34,6 +34,7 @@ import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.amazon.speech.ui.SsmlOutputSpeech;
 
+import quote.GetQuote;
 import sep.lucene.SearchFiles;
 import sep.lucene.SearchResult;
 
@@ -46,9 +47,9 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 	/**
 	 * URL prefix to download random quote from Encyclopedia of Philosophy.
 	 */
-	protected static final String URL_PREFIX = "http://plato.stanford.edu/cgi-bin/encyclopedia/random";
     private static final String SLOT_SEARCH_PHRASE = "SearchPhrase";
     private SearchFiles searchFiles = new SearchFiles();
+    private GetQuote getQuote = new GetQuote();
 
 	@Override
 	public void onSessionStarted(final SessionStartedRequest request, final Session session) throws SpeechletException {
@@ -71,7 +72,7 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 		String intentName = intent.getName();
 
 		if ("GetQuote".equals(intentName)) {
-			SearchResult searchResult = getEntryFromStanford();
+			SearchResult searchResult = getQuote.getEntryFromStanford();
 			if ( searchResult.preamble.isEmpty()) {
 				log.info("Intent = GetQuote: *** fails *** ");
 				SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
@@ -167,37 +168,6 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 		return newAskResponse(speechOutput, false, repromptText, false);
 	}
 
-
-	public SearchResult getEntryFromStanford() {
-		String text = "";
-		String subject = "";
-		String url = "";
-		Document doc;
-		try {
-			Response response = Jsoup.connect(URL_PREFIX)
-	                .followRedirects(true) //to follow redirects
-	                .execute();
-			doc = response.parse();
-			Elements preamble = doc.select("div[id=preamble] p");
-			URL rUrl = response.url();
-			if ( rUrl != null )
-				url = rUrl.toString();
-			
-			Elements subjects = doc.select("div[id=aueditable] h1");
-			if ( subjects != null ) 
-				if ( subjects.first() != null )
-					subject = subjects.first().ownText();
-			
-			if (preamble != null) {
-				if (preamble.first() != null)
-					text = preamble.first().text();
-			}
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-		return new SearchResult(subject, url, subject, text, (float)1.0);
-	}
-
 	/**
 	 * Wrapper for creating the Ask response from the input strings.
 	 * 
@@ -234,5 +204,7 @@ public class EncyclophiaOfPhilosophySpeechlet implements Speechlet {
 		reprompt.setOutputSpeech(repromptOutputSpeech);
 		return SpeechletResponse.newAskResponse(outputSpeech, reprompt);
 	}
+
+
 
 }
