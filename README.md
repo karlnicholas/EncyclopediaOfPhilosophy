@@ -2,10 +2,7 @@
 A simple [AWS Lambda](http://aws.amazon.com/lambda) function that demonstrates a basic skill for the Amazon Echo using the Alexa SDK.
 
 ## Concepts
-This shows how to create a Lambda function for handling Alexa Skill requests that:
-
- - Web service: communicate with an external web service to get random philosophy quotes (plato.stanford.edu)
- - SSML: Using SSML tags to control how Alexa renders the text-to-speech.
+This shows how to create a Lambda function for handling Alexa Skill requests:
 
 ## Setup
 To run this example skill you need to do two things. The first is to deploy the example code in lambda, and the second is to configure the Alexa skill to use Lambda.

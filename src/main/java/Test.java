@@ -4,9 +4,8 @@ import java.util.List;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 
-import encyclopediaofphilosophy.PingSEP;
-import sep.lucene.SearchFiles;
-import sep.lucene.SearchResult;
+import iep.lucene.SearchFiles;
+import iep.lucene.SearchResult;
 
 public class Test {
 	
