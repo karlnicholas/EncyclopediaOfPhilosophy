@@ -20,7 +20,7 @@ public class Test {
 	public void run() {
 		List<SearchResult> searchResults;
 		try {
-			searchResults = searchFiles.query("philosophy");
+			searchResults = searchFiles.query("Kant");
 			if ( searchResults.size() > 0 ) {
 				System.out.println("Found results: " + searchResults.size());
 				for ( SearchResult searchResult: searchResults ) {
