@@ -29,11 +29,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 import static com.amazon.ask.request.Predicates.intentName;
 
 public class EncyclopediaOfPhilosophySearchIntentHandler implements RequestHandler {
+    private static final Logger logger = LogManager.getLogger(EncyclopediaOfPhilosophySearchIntentHandler.class);
     private static final String SLOT_SEARCH_PHRASE = "SearchPhrase";
     private SearchFiles searchFiles = new SearchFiles();
 
@@ -65,20 +68,23 @@ public class EncyclopediaOfPhilosophySearchIntentHandler implements RequestHandl
 			try {
 				searchResults = searchFiles.query(searchPhrase);
 			} catch (ParseException | IOException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 			if ( searchResults != null && searchResults.size() > 0 ) {
 				// Create the plain text output				
 	            speechText = "Results for " + searchPhrase +". " + searchResults.get(0).preamble;
 	            url = searchResults.get(0).url;
 	            good = true;
+	            logger.info("Results for " + searchPhrase);
 			} else {
 	            speechText = "Sorry, nothing found for " + searchPhrase + ". You can search for another entry or ask for a quote.";
+	            logger.info("Sorry, nothing found for " + searchPhrase);
 			}
 
         } else {
             // Render an error since we don't know what the users favorite color is.
             speechText = "Sorry, I didn't understand that. You can search for another entry or ask for a quote.";
+            logger.info("Sorry, I didn't understand that. You can search for another entry or ask for a quote.");
         }
 
         if ( good ) {
