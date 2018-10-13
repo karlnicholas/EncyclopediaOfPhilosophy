@@ -75,7 +75,7 @@ public class EncyclopediaOfPhilosophySearchIntentHandler implements RequestHandl
 	            speechText = "Results for " + searchPhrase +". " + searchResults.get(0).preamble;
 	            url = searchResults.get(0).url;
 	            good = true;
-	            logger.info("Results for " + searchPhrase);
+	            logger.info("Results for " + searchPhrase + "=" + searchResults.get(0).subject + ":" + searchResults.get(0).url);
 			} else {
 	            speechText = "Sorry, nothing found for " + searchPhrase + ". You can search for another entry or ask for a quote.";
 	            logger.info("Sorry, nothing found for " + searchPhrase);
