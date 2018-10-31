@@ -57,7 +57,7 @@ public class EncyclopediaOfPhilosophySearchIntentHandler implements RequestHandl
 
         String speechText;
         boolean good = false;
-        String url = null;
+        SearchResult searchResult = null;
 
         // Check for favorite color and create output to user.
         if (searchPhraseSlot != null) {
@@ -71,11 +71,11 @@ public class EncyclopediaOfPhilosophySearchIntentHandler implements RequestHandl
 				logger.error(e);
 			}
 			if ( searchResults != null && searchResults.size() > 0 ) {
+				searchResult = searchResults.get(0);
 				// Create the plain text output				
-	            speechText = "Results for " + searchPhrase +". " + searchResults.get(0).preamble;
-	            url = searchResults.get(0).url;
+	            speechText = "Search found " + searchResult.subject +". " + searchResult.preamble;
 	            good = true;
-	            logger.info("Results for " + searchPhrase + "=" + searchResults.get(0).subject + ":" + searchResults.get(0).url);
+	            logger.info("Search found " + searchResult.subject + " for " + searchPhrase + ":" + searchResult.url);
 			} else {
 	            speechText = "Sorry, nothing found for " + searchPhrase + ". You can search for another entry or ask for a quote.";
 	            logger.info("Sorry, nothing found for " + searchPhrase);
@@ -89,8 +89,9 @@ public class EncyclopediaOfPhilosophySearchIntentHandler implements RequestHandl
 
         if ( good ) {
             return input.getResponseBuilder()
-                    .withSpeech(speechText + "<p>You can search again or ask for a quote.</p>")
-                    .withSimpleCard("Encyclopedia Of Philosophy",  "https://www.iep.utm.edu/" + url + "\n" + speechText)
+                    .withSpeech(speechText + " You can search again or ask for a quote.")
+                    .withSimpleCard("Search found " + searchResult.subject,  "https://www.iep.utm.edu/" + searchResult.url + "\n" + speechText)
+                    .withSimpleCard("Encyclopedia Of Philosophy",  speechText)
                     .withReprompt("You can search for another entry or ask for a quote, or stop.")
                     .withShouldEndSession(false)
                     .build();

@@ -61,7 +61,7 @@ public class EncyclopediaOfPhilosophyQuoteIntentHandler implements RequestHandle
 
         return input.getResponseBuilder()
                 .withSpeech(speechText + "<p>You can ask for another quote or do a search.</p>")
-                .withSimpleCard("Encyclopedia Of Philosophy",  "https://www.iep.utm.edu/" + searchResult.url + "\n" + speechText)
+                .withSimpleCard("Entry for " + searchResult.subject,  "https://www.iep.utm.edu/" + searchResult.url + "\n" + speechText)
                 .withReprompt("You can search for an entry, ask for a quote, or stop.")
                 .withShouldEndSession(false)
                 .build();
